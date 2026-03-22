@@ -1,0 +1,22 @@
+# 秘密情報（必ずコミットしない）
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+.venv_local/
+venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# エディタ・OS
+.DS_Store
+.idea/
+.vscode/

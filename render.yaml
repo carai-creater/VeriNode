@@ -1,0 +1,27 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: verify-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    envVars:
+      - key: SERPER_API_KEY
+        sync: false
+      - key: VERIFY_SKIP_PAYMENT
+        value: "1"
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      # 未設定時は RENDER_EXTERNAL_URL がアプリ側で使われる（Stripe Checkout の戻り先）
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: STRIPE_PRICE_ID
+        sync: false
+      - key: STRIPE_VERIFY_UNIT_AMOUNT_JPY
+        value: "100"
+      - key: VERIFY_PAYMENT_TOKEN
+        sync: false
+      - key: PAYMENT_LINK_URL
+        sync: false
