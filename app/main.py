@@ -142,7 +142,7 @@ def _root_page_html() -> str:
     <table class="legal" aria-label="特定商取引法に基づく表記">
       <tbody>
         <tr><th scope="row">運営者名</th><td>林 連太郎</td></tr>
-        <tr><th scope="row">所在地</th><td>〒849-0937 佐賀県佐賀市鍋島4丁目2-11 cope nabeshima202</td></tr>
+        <tr><th scope="row">所在地</th><td>〒849-0937 佐賀県佐賀市鍋島4丁目2-11 コーポ鍋島２０２</td></tr>
         <tr><th scope="row">連絡先</th><td><a href="mailto:carai@cocarai.com">carai@cocarai.com</a></td></tr>
         <tr><th scope="row">支払方法</th><td>クレジットカード決済（Stripe）</td></tr>
         <tr><th scope="row">商品の引渡時期</th><td>決済完了後、即時</td></tr>
