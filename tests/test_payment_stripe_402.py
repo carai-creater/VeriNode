@@ -32,6 +32,11 @@ def client_stripe_gate(monkeypatch: pytest.MonkeyPatch):
     config_module.get_settings.cache_clear()
 
 
+def test_landing_pages_skip_payment_gate(client_stripe_gate: TestClient):
+    assert client_stripe_gate.get("/").status_code == 200
+    assert client_stripe_gate.get("/en").status_code == 200
+
+
 def test_verify_without_proof_returns_402_stripe_checkout(client_stripe_gate: TestClient):
     r = client_stripe_gate.post("/verify", json={"claim": "anything"})
     assert r.status_code == 402

@@ -19,6 +19,7 @@ class PaymentRequiredMiddleware(BaseHTTPMiddleware):
         self.exempt_paths = exempt_paths or frozenset(
             {
                 "/",
+                "/en",
                 "/health",
                 "/docs",
                 "/redoc",

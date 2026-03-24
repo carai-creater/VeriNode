@@ -29,6 +29,20 @@ def test_health(client: TestClient):
     assert client.get("/health").json() == {"ok": True}
 
 
+def test_root_japanese(client: TestClient):
+    r = client.get("/")
+    assert r.status_code == 200
+    assert 'lang="ja"' in r.text
+    assert "特定商取引法" in r.text
+
+
+def test_root_english(client: TestClient):
+    r = client.get("/en")
+    assert r.status_code == 200
+    assert 'lang="en"' in r.text
+    assert "Specified Commercial Transactions" in r.text
+
+
 def test_agent_card(client: TestClient):
     r = client.get("/.well-known/ai-agent.json")
     assert r.status_code == 200
