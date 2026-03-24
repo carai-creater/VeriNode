@@ -46,228 +46,398 @@ def _root_page_html() -> str:
   <title>{SERVICE_NAME} · Fact-check API</title>
   <style>
     :root {{
-      --bg: #f4f5f7;
+      --bg: #f5f5f7;
       --surface: #ffffff;
-      --text: #111318;
-      --muted: #5c6370;
-      --line: rgba(17, 19, 24, 0.08);
-      --accent: #0f766e;
-      --accent-soft: rgba(15, 118, 110, 0.12);
-      --radius: 12px;
-      --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Hiragino Sans",
-        "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-      --mono: ui-monospace, "SF Mono", "Cascadia Code", "Consolas", monospace;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --line: rgba(0, 0, 0, 0.08);
+      --link: #0066cc;
+      --radius: 18px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+        "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
+      --mono: "SF Mono", ui-monospace, "Cascadia Code", "Consolas", monospace;
+      --shell-pad: clamp(1.25rem, 4vw, 2.75rem);
+      --shell-max: min(1200px, calc(100% - 2 * var(--shell-pad)));
     }}
     @media (prefers-color-scheme: dark) {{
       :root {{
-        --bg: #0c0e12;
-        --surface: #14171d;
-        --text: #e8eaef;
-        --muted: #9aa3b2;
-        --line: rgba(232, 234, 239, 0.1);
-        --accent: #2dd4bf;
-        --accent-soft: rgba(45, 212, 191, 0.15);
+        --bg: #000000;
+        --surface: #1c1c1e;
+        --text: #f5f5f7;
+        --muted: #a1a1a6;
+        --line: rgba(255, 255, 255, 0.12);
+        --link: #2997ff;
       }}
     }}
     * {{ box-sizing: border-box; }}
+    html {{ scroll-behavior: smooth; }}
     body {{
       margin: 0;
       font-family: var(--font);
       color: var(--text);
       background: var(--bg);
-      line-height: 1.6;
-      font-size: 15px;
+      font-size: 17px;
+      line-height: 1.47059;
       -webkit-font-smoothing: antialiased;
     }}
-    .wrap {{
-      max-width: 44rem;
+    .shell {{
+      width: 100%;
+      max-width: var(--shell-max);
       margin: 0 auto;
-      padding: clamp(2rem, 5vw, 3.25rem) 1.25rem 4rem;
+      padding-left: var(--shell-pad);
+      padding-right: var(--shell-pad);
     }}
-    .hero {{
-      margin-bottom: 2rem;
+    .topbar {{
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      background: var(--bg);
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      border-bottom: 1px solid var(--line);
     }}
-    .brand {{
+    .topbar .inner {{
       display: flex;
       flex-wrap: wrap;
-      align-items: baseline;
-      gap: 0.65rem 0.85rem;
-      margin-bottom: 0.5rem;
-    }}
-    h1 {{
-      font-size: clamp(1.35rem, 3.5vw, 1.65rem);
-      font-weight: 650;
-      letter-spacing: -0.03em;
-      margin: 0;
-      line-height: 1.2;
-    }}
-    .ver {{
-      font-family: var(--mono);
-      font-size: 0.72rem;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem 1.25rem;
+      min-height: 3.25rem;
+      font-size: 12px;
       font-weight: 500;
-      letter-spacing: 0.02em;
-      color: var(--muted);
-      padding: 0.2rem 0.5rem;
-      border-radius: 6px;
-      background: var(--line);
+      letter-spacing: -0.01em;
     }}
-    .lead {{
+    .topbar nav {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem 1.1rem;
+    }}
+    .topbar a {{
       color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0;
-      max-width: 36em;
+      text-decoration: none;
+      white-space: nowrap;
+    }}
+    .topbar a:hover {{ color: var(--text); }}
+    .hero {{
+      padding: clamp(3.5rem, 12vw, 6.5rem) 0 clamp(3rem, 8vw, 4.5rem);
+      text-align: center;
+    }}
+    .hero h1 {{
+      font-size: clamp(2.5rem, 7vw, 3.75rem);
+      font-weight: 600;
+      letter-spacing: -0.022em;
+      line-height: 1.05;
+      margin: 0 0 0.35rem;
+    }}
+    .hero .ver {{
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      margin-bottom: 1rem;
+    }}
+    .hero .lead {{
+      font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+      color: var(--muted);
+      max-width: 38rem;
+      margin: 0 auto 2rem;
+      font-weight: 400;
     }}
     .quick {{
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
-      margin: 1.35rem 0 0;
-      padding: 0;
+      justify-content: center;
+      gap: 0.65rem;
       list-style: none;
+      margin: 0;
+      padding: 0;
     }}
     .quick a {{
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
-      font-size: 0.8125rem;
+      padding: 0.5rem 1rem;
+      font-size: 14px;
       font-weight: 500;
-      color: var(--accent);
+      color: var(--link);
       text-decoration: none;
-      padding: 0.4rem 0.75rem;
       border-radius: 999px;
-      background: var(--accent-soft);
-      transition: transform 0.12s ease, opacity 0.12s ease;
-    }}
-    .quick a:hover {{ opacity: 0.92; transform: translateY(-1px); }}
-    .panel {{
-      background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 1.25rem 1.35rem 1.1rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      background: var(--surface);
+      transition: opacity 0.15s ease;
     }}
-    @media (prefers-color-scheme: dark) {{
-      .panel {{ box-shadow: none; }}
+    .quick a:hover {{ opacity: 0.75; }}
+    .section {{
+      padding: clamp(3rem, 7vw, 5rem) 0;
+      border-top: 1px solid var(--line);
     }}
-    h2 {{
-      font-size: 0.7rem;
+    .section-head {{
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
       font-weight: 600;
-      letter-spacing: 0.12em;
+      letter-spacing: -0.019em;
+      line-height: 1.1;
+      margin: 0 0 1rem;
+    }}
+    .section-sub {{
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 46rem;
+      margin: 0 0 1.75rem;
+    }}
+    .grid-2 {{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: clamp(1.5rem, 4vw, 2.5rem);
+    }}
+    @media (min-width: 900px) {{
+      .grid-2 {{ grid-template-columns: 1fr 1fr; gap: 3rem 4rem; }}
+    }}
+    .card {{
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: clamp(1.5rem, 3vw, 2rem);
+      border: 1px solid var(--line);
+    }}
+    .card h3 {{
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
       text-transform: uppercase;
       color: var(--muted);
-      margin: 0 0 0.85rem;
+      margin: 0 0 0.75rem;
     }}
-    p {{ margin: 0 0 0.85rem; }}
-    p:last-child {{ margin-bottom: 0; }}
-    ul.api {{
+    .card p, .card li {{
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--text);
+    }}
+    .card p {{ margin: 0 0 0.85rem; }}
+    .card p:last-child {{ margin-bottom: 0; }}
+    .card ul {{
       margin: 0;
-      padding-left: 1.1rem;
+      padding-left: 1.15rem;
       color: var(--muted);
-      font-size: 0.9rem;
     }}
-    ul.api li {{ margin-bottom: 0.45rem; }}
-    ul.api li:last-child {{ margin-bottom: 0; }}
-    code {{
-      font-family: var(--mono);
-      font-size: 0.84em;
-      padding: 0.12em 0.38em;
-      border-radius: 5px;
-      background: var(--line);
-      color: var(--text);
-    }}
-    .price {{
-      font-family: var(--mono);
-      font-size: 1rem;
+    .card ul li {{ margin-bottom: 0.4rem; }}
+    .price-row {{
+      font-size: clamp(1.75rem, 3.5vw, 2.25rem);
       font-weight: 600;
-      color: var(--text);
       letter-spacing: -0.02em;
+      margin: 0 0 0.5rem;
     }}
-    .note {{
-      font-size: 0.875rem;
+    .price-note {{
+      font-size: 15px;
       color: var(--muted);
+      margin: 0;
+    }}
+    code, .mono {{
+      font-family: var(--mono);
+      font-size: 0.9em;
+    }}
+    code {{
+      padding: 0.15em 0.4em;
+      border-radius: 6px;
+      background: var(--line);
     }}
     table.legal {{
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.875rem;
+      font-size: 15px;
     }}
     table.legal th,
     table.legal td {{
       text-align: left;
       vertical-align: top;
-      padding: 0.55rem 0;
+      padding: 0.85rem 0;
       border-bottom: 1px solid var(--line);
     }}
     table.legal tr:last-child th,
-    table.legal tr:last-child td {{
-      border-bottom: none;
-    }}
+    table.legal tr:last-child td {{ border-bottom: none; }}
     table.legal th {{
-      width: 9.5rem;
+      width: min(12rem, 32%);
       color: var(--muted);
       font-weight: 500;
-      padding-right: 0.75rem;
+      padding-right: 1.25rem;
     }}
-    table.legal a {{ color: var(--accent); text-decoration: none; }}
+    table.legal a {{ color: var(--link); text-decoration: none; }}
     table.legal a:hover {{ text-decoration: underline; }}
-    footer {{
-      margin-top: 1.75rem;
-      font-size: 0.8rem;
+    .prose p {{
+      font-size: 15px;
       color: var(--muted);
+      margin: 0 0 1rem;
+      max-width: 52rem;
+    }}
+    .prose p:last-child {{ margin-bottom: 0; }}
+    .prose strong {{ color: var(--text); font-weight: 600; }}
+    .prose a {{ color: var(--link); text-decoration: none; }}
+    .prose a:hover {{ text-decoration: underline; }}
+    .card.prose h3 {{
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      text-transform: none;
+      letter-spacing: -0.01em;
+      margin: 0 0 0.65rem;
+    }}
+    footer.site {{
+      padding: 2.5rem 0 4rem;
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
     }}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="hero">
-      <div class="brand">
-        <h1>{SERVICE_NAME}</h1>
-        <span class="ver">v{APP_VERSION}</span>
-      </div>
+  <div class="topbar">
+    <div class="shell inner">
+      <a href="/" style="color:var(--text);font-weight:600;">{SERVICE_NAME}</a>
+      <nav aria-label="ページ内">
+        <a href="#service">サービス</a>
+        <a href="#pricing">料金</a>
+        <a href="#payment">決済・返金</a>
+        <a href="#legal">特商法</a>
+        <a href="#terms">利用規約</a>
+        <a href="#privacy">プライバシー</a>
+      </nav>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="shell">
+      <h1>{SERVICE_NAME}</h1>
+      <div class="ver">v{APP_VERSION}</div>
       <p class="lead">{SERVICE_TAGLINE}</p>
-      <ul class="quick" aria-label="開発者リンク">
-        <li><a href="/docs">OpenAPI / Swagger</a></li>
+      <ul class="quick" aria-label="開発者向けリンク">
+        <li><a href="/docs">OpenAPI（Swagger）</a></li>
         <li><a href="/.well-known/agent-card.json">A2A agent-card</a></li>
         <li><a href="/.well-known/ai-agent.json">Legacy agent JSON</a></li>
-        <li><a href="/health"><code>/health</code></a></li>
+        <li><a href="/health"><span class="mono">GET &#47;health</span></a></li>
       </ul>
-    </header>
+    </div>
+  </header>
 
-    <section class="panel" aria-labelledby="api-h">
-      <h2 id="api-h">API</h2>
-      <p>Web 検索に基づく主張検証。エージェントやバックエンドから <code>POST /verify</code>（JSON）で呼び出します。</p>
-      <ul class="api">
-        <li>レスポンス: スコア・根拠ソース・要約</li>
-        <li>課金: 未払い時は <code>402 Payment Required</code>、<code>X-Payment-Link</code> から Stripe Checkout</li>
-        <li>ディスカバリ: <code>/.well-known/agent-card.json</code>（A2A）</li>
-      </ul>
+  <main>
+    <section id="service" class="section">
+      <div class="shell">
+        <h2 class="section-head">サービス内容</h2>
+        <p class="section-sub">
+          本サービスは、プログラムや AI エージェントから HTTP API で利用する<strong>オンラインのファクトチェック（主張の検証）</strong>です。
+          お客様が送信した主張テキストを、公開ウェブ検索に基づき分析し、スコア・参照情報・要約などを JSON で返します。
+        </p>
+        <div class="grid-2">
+          <div class="card">
+            <h3>提供形態</h3>
+            <p>デジタルサービス（API）。物理的な配送はありません。決済完了後、当該リクエストに対する検証結果を即時に返却します。</p>
+            <ul>
+              <li>主なエンドポイント: <code>POST /verify</code></li>
+              <li>未決済時は <code>402</code> と Stripe Checkout への案内（<code>X-Payment-Link</code>）</li>
+              <li>エージェント向け記述: <code>/.well-known/agent-card.json</code></li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>表示・審査用情報</h3>
+            <p>
+              決済処理は <strong>Stripe, Inc.</strong> のセキュアな Checkout を利用します。カード番号等の決済情報は当社サーバーに保存せず、Stripe の方針に従って取り扱われます。
+            </p>
+            <p style="margin-bottom:0;">
+              本ページの<strong>特定商取引法に基づく表記</strong>に、販売事業者名・所在地・連絡先・支払方法・引渡時期・返品条件を記載しています。
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section class="panel" aria-labelledby="price-h">
-      <h2 id="price-h">Pricing</h2>
-      <p class="price">¥100 / request（税込）</p>
-      <p class="note">Stripe カード決済。ゲート通過後に API が利用可能になります。</p>
+    <section id="pricing" class="section">
+      <div class="shell">
+        <h2 class="section-head">料金</h2>
+        <p class="section-sub">
+          日本円（JPY）表示・税込価格です。API 1 回の検証リクエストごとに課金する従量制です。
+        </p>
+        <div class="card" style="max-width: 36rem;">
+          <p class="price-row">¥100（税込）/ 1 リクエスト</p>
+          <p class="price-note">
+            価格に含まれるもの: 当該リクエストに対するファクトチェック API の利用 1 回分。
+            Stripe など決済ネットワーク側で別途手数料が発生する場合は、カード会社等の規約に従います。
+          </p>
+        </div>
+      </div>
     </section>
 
-    <section class="panel" aria-labelledby="legal-h">
-      <h2 id="legal-h">特定商取引法に基づく表記</h2>
-      <table class="legal" aria-label="特定商取引法に基づく表記">
-        <tbody>
-          <tr><th scope="row">運営者名</th><td>林 連太郎</td></tr>
-          <tr><th scope="row">所在地</th><td>〒849-0937 佐賀県佐賀市鍋島4丁目2-11 コーポ鍋島２０２</td></tr>
-          <tr><th scope="row">連絡先</th><td><a href="mailto:carai@cocarai.com">carai@cocarai.com</a></td></tr>
-          <tr><th scope="row">支払方法</th><td>クレジットカード決済（Stripe）</td></tr>
-          <tr><th scope="row">商品の引渡時期</th><td>決済完了後、即時</td></tr>
-          <tr><th scope="row">返品</th><td>デジタルコンテンツの特性上、返品不可</td></tr>
-        </tbody>
-      </table>
+    <section id="payment" class="section">
+      <div class="shell">
+        <h2 class="section-head">お支払い・キャンセル・返金</h2>
+        <div class="grid-2">
+          <div class="card prose">
+            <h3>お支払い</h3>
+            <p>クレジットカード決済（Stripe）。Checkout 画面の手順に従いお支払いください。決済完了をもって当該分の API 利用が有効になります。</p>
+          </div>
+          <div class="card prose">
+            <h3>キャンセル・返金</h3>
+            <p>
+              本サービスはデジタルコンテンツ（API による検証結果の提供）です。<strong>検証処理が完了し結果が提供された後の返金・キャンセルはお受けできません。</strong>
+              特定商取引法その他の法令により返金が義務付けられる場合は、その限りではありません。
+            </p>
+            <p>重複課金・決済エラーなど、明らかなシステム上の不具合があった場合は、下記連絡先までご連絡ください。事実関係を確認のうえ対応します。</p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <footer>
-      <p>{SERVICE_NAME} — Fact-check API</p>
-    </footer>
-  </div>
+    <section id="legal" class="section">
+      <div class="shell">
+        <h2 class="section-head">特定商取引法に基づく表記</h2>
+        <p class="section-sub">通信販売（デジタルサービス）に関する表示です。</p>
+        <div class="card">
+          <table class="legal" aria-label="特定商取引法に基づく表記">
+            <tbody>
+              <tr><th scope="row">運営者名</th><td>林 連太郎</td></tr>
+              <tr><th scope="row">所在地</th><td>〒849-0937 佐賀県佐賀市鍋島4丁目2-11 コーポ鍋島２０２</td></tr>
+              <tr><th scope="row">連絡先</th><td><a href="mailto:carai@cocarai.com">carai@cocarai.com</a>（お問い合わせはメールにて受け付けます）</td></tr>
+              <tr><th scope="row">支払方法</th><td>クレジットカード決済（Stripe）</td></tr>
+              <tr><th scope="row">商品の引渡時期</th><td>決済完了後、即時（API 応答として提供）</td></tr>
+              <tr><th scope="row">返品</th><td>デジタルコンテンツの特性上、原則として返品不可（上記「キャンセル・返金」を参照）</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="terms" class="section">
+      <div class="shell">
+        <h2 class="section-head">利用規約（概要）</h2>
+        <p class="section-sub">本サービスをご利用いただく前に、以下をご確認ください。詳細な条項が必要な場合は別途文書で定めることがあります。</p>
+        <div class="card prose">
+          <p><strong>適用</strong>：本規約は、{SERVICE_NAME} ファクトチェック API（以下「本サービス」）の利用に適用されます。</p>
+          <p><strong>契約の成立</strong>：お客様が API を利用し、Stripe 経由で料金の支払が完了したとき、当該リクエストについて本サービス提供契約が成立します。</p>
+          <p><strong>禁止事項</strong>：法令違反、第三者の権利侵害、当サービスや関連インフラへの不正アクセス・過度な負荷、虚偽の申告、その他運営が不適切と判断する利用を禁止します。</p>
+          <p><strong>免責</strong>：検証結果は公開情報に基づく参考情報であり、100% の正確性を保証するものではありません。重大な過失がある場合を除き、間接損害等について責任を負いかねます。詳細は管轄法令の範囲で定めます。</p>
+          <p><strong>準拠法・管轄</strong>：日本法を準拠法とし、紛争については運営者所在地を管轄する裁判所を専属的合意管轄とします。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="privacy" class="section">
+      <div class="shell">
+        <h2 class="section-head">プライバシー（概要）</h2>
+        <p class="section-sub">個人データの取り扱いの要点です。正式なプライバシーポリシーが別途ある場合はそちらを優先します。</p>
+        <div class="card prose">
+          <p><strong>決済情報</strong>：カード情報等は Stripe が取得・処理します。当社は Stripe が提供する範囲で決済に必要な情報を受け取る場合があります。</p>
+          <p><strong>サービス提供</strong>：API に送信された主張テキストは、ファクトチェックのために検索プロバイダ等の外部サービスへ送信される場合があります。ログや課金記録として一定期間技術的に保存されることがあります。</p>
+          <p><strong>お問い合わせ</strong>：メールでご連絡いただいた内容は、対応のために保存・利用します。</p>
+          <p><strong>開示・訂正・削除</strong>：個人情報保護法その他法令に基づく請求については、<a href="mailto:carai@cocarai.com">carai@cocarai.com</a> までご連絡ください。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site">
+    <div class="shell">
+      <p>{SERVICE_NAME} · Fact-check API · 本サイトは決済・事業者情報の公開用 URL として利用できます。</p>
+    </div>
+  </footer>
 </body>
 </html>"""
 
