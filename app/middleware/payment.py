@@ -24,6 +24,7 @@ class PaymentRequiredMiddleware(BaseHTTPMiddleware):
                 "/redoc",
                 "/openapi.json",
                 "/.well-known/ai-agent.json",
+                "/.well-known/agent-card.json",
                 "/billing/checkout-session",
                 "/billing/success",
                 "/webhooks/stripe",

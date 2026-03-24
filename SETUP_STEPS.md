@@ -59,8 +59,9 @@ curl -sS -X POST http://127.0.0.1:8000/verify \
 **あなたが行うこと**
 
 1. サーバー起動中にブラウザまたは curl で開く:  
-   `http://127.0.0.1:8000/.well-known/ai-agent.json`
-2. JSON に `name`, `api`, `auth` が含まれることを確認する。
+   - `http://127.0.0.1:8000/.well-known/agent-card.json`（[Google A2A](https://github.com/google/A2A) 向け Well-Known）  
+   - `http://127.0.0.1:8000/.well-known/ai-agent.json`（VeriNode 従来形式）
+2. JSON に `name` と能力説明が含まれることを確認する（`agent-card` なら `supportedInterfaces` / `skills` も）。
 
 ---
 

@@ -1,0 +1,21 @@
+{
+  "name": "verinode",
+  "description": "検証のプロ — AI エージェント向けファクトチェックと決済ゲート（HTTP POST /verify、HTTP 402 + Stripe Checkout）",
+  "url": "__PUBLIC_BASE_URL__",
+  "version": "0.2.0",
+  "protocol_version": "0.3.0",
+  "preferred_transport": "JSONRPC",
+  "skills": [
+    {
+      "id": "verinode-verify",
+      "description": "REST: POST __PUBLIC_BASE_URL__/verify with JSON body {\"claim\":\"...\"}. On HTTP 402 follow X-Payment-Link (Stripe), then retry with X-Payment-Proof: cs_... . Not A2A SendMessage."
+    }
+  ],
+  "metadata": {
+    "actual_protocol": "HTTP+JSON REST",
+    "verify_path": "/verify",
+    "well_known_agent_card": "__PUBLIC_BASE_URL__/.well-known/agent-card.json",
+    "openapi": "__PUBLIC_BASE_URL__/openapi.json",
+    "pricing_jpy_tax_included_per_request": 100
+  }
+}

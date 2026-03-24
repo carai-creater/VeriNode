@@ -1,4 +1,8 @@
-"""エージェント発見用 Agent Card（A2A 系の一般的な形に準拠）。"""
+"""エージェント発見用メタデータ。
+
+- `build_agent_card`: 従来の `/.well-known/ai-agent.json`（VeriNode 独自拡張あり）
+- `build_a2a_agent_card`: [Google A2A](https://github.com/google/A2A) の Well-Known `/.well-known/agent-card.json` 向け（camelCase）
+"""
 
 from __future__ import annotations
 
@@ -67,5 +71,58 @@ def build_agent_card(request: Request, settings: Settings) -> Dict[str, Any]:
                 "mcp_stdio": "python -m app.mcp_server",
                 "tool_name": "verify_information",
             },
+        },
+    }
+
+
+def build_a2a_agent_card(request: Request, settings: Settings) -> Dict[str, Any]:
+    """
+    Google A2A 仕様の Agent Card 例に沿った公開用 JSON（JSON フィールドは camelCase）。
+
+    注: 本サービスは A2A コアの SendMessage / Task API は実装していません。
+    HTTP+JSON の `POST /verify` と課金ゲート（402）を skills と metadata で明示します。
+    """
+    base = _public_origin(request, settings)
+    verify_desc = (
+        f"REST API: POST {base}/verify with JSON body {{\"claim\": \"<text>\"}}. "
+        "Returns verification score, sources, and reason. "
+        "If payment is required, responds with HTTP 402 and header X-Payment-Link (Stripe Checkout); "
+        "after payment, retry with header X-Payment-Proof set to the Checkout Session id (cs_...). "
+        "Does not implement A2A SendMessage; use this REST contract."
+    )
+    return {
+        "name": SERVICE_NAME,
+        "description": SERVICE_TAGLINE,
+        "version": APP_VERSION,
+        "supportedInterfaces": [
+            {
+                "url": base,
+                "protocolBinding": "HTTP+JSON",
+                "protocolVersion": "0.3",
+            }
+        ],
+        "capabilities": {
+            "streaming": False,
+            "pushNotifications": False,
+        },
+        "defaultInputModes": ["application/json"],
+        "defaultOutputModes": ["application/json"],
+        "documentationUrl": f"{base}/docs",
+        "skills": [
+            {
+                "id": "verinode-verify",
+                "name": "Fact-check claim",
+                "description": verify_desc,
+                "tags": ["fact-check", "verification", "search", "rest", "stripe"],
+                "examples": ['POST /verify  {"claim": "検証したい主張"}'],
+                "inputModes": ["application/json"],
+                "outputModes": ["application/json"],
+            }
+        ],
+        "metadata": {
+            "legacyAgentDescriptor": f"{base}/.well-known/ai-agent.json",
+            "openapiUrl": f"{base}/openapi.json",
+            "pricingJpyTaxIncludedPerRequest": 100,
+            "note": "Not a full A2A message/task server; discovery uses A2A Agent Card shape.",
         },
     }
