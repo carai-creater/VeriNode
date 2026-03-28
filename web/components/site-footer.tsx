@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const links = [
-  { href: "/legal", label: "特定商取引法に基づく表記" },
+  { href: "/law", label: "特定商取引法に基づく表記" },
   { href: "/terms", label: "利用規約" },
   { href: "/privacy", label: "プライバシーポリシー" },
 ];

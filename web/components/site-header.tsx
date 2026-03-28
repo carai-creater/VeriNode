@@ -26,7 +26,7 @@ export function SiteHeader() {
         </nav>
         <div className="flex items-center gap-3">
           <Link
-            href="/legal"
+            href="/law"
             className="hidden text-xs text-zinc-500 hover:text-zinc-300 sm:inline"
           >
             特商法

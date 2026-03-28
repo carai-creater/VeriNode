@@ -217,7 +217,7 @@ export default function HomePage() {
             </div>
             <p className="mx-auto mt-10 max-w-2xl text-center text-xs leading-relaxed text-zinc-500">
               従量課金（例: 1 リクエストあたりの API 利用料）を併用する場合は、
-              <Link href="/legal" className="text-brand-400 underline-offset-2 hover:underline">
+              <Link href="/law" className="text-brand-400 underline-offset-2 hover:underline">
                 特定商取引法に基づく表記
               </Link>
               および Checkout 画面の表示に従います。解約はアカウント設定（ダッシュボード）から随時可能です。
