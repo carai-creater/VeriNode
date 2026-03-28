@@ -16,6 +16,11 @@ __pycache__/
 dist/
 build/
 
+# Node / Next.js (web/)
+web/node_modules/
+web/.next/
+web/out/
+
 # エディタ・OS
 .DS_Store
 .idea/
