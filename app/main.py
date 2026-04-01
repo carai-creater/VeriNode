@@ -16,17 +16,17 @@ from app.models import VerifyRequest, VerifyResponse
 from app.payment_gate import is_payment_proof_valid
 from app.routers import billing, webhooks
 from app.verify_service import verify_claim
-from app.stripe_service import create_verify_checkout_session, resolve_public_base_url
+from app.stripe_service import create_verify_checkout_session, resolve_checkout_return_base_url
 
 PAYMENT_REASON_FMT = (
-    "情報の検証には50円が必要です。こちらのリンクから決済を完了してください：{url}"
+    "情報の検証には100円が必要です。こちらのリンクから決済を完了してください：{url}"
 )
 
 
 async def _verify_response_payment_required(response: Response, settings: Settings) -> VerifyResponse:
     """未払い時: HTTP 200・VerifyResponse（reason に決済 URL、必要なら X-Payment-Link ヘッダー）。"""
     if settings.stripe_secret_key:
-        public_origin = resolve_public_base_url(settings)
+        public_origin = resolve_checkout_return_base_url(settings)
         if not public_origin:
             raise HTTPException(
                 status_code=503,
@@ -34,8 +34,9 @@ async def _verify_response_payment_required(response: Response, settings: Settin
                     "detail": "stripe_needs_public_base_url",
                     "message": (
                         "STRIPE_SECRET_KEY はあるが Checkout の戻り先が未定です。"
-                        " ローカルなら PUBLIC_BASE_URL=http://127.0.0.1:8000（ポートは uvicorn と一致）、"
-                        " 本番はホストの公開 URL または PUBLIC_BASE_URL を設定してください。"
+                        " 本番は STRIPE_CHECKOUT_RETURN_BASE_URL=https://verinode.onrender.com のように設定するか、"
+                        " PUBLIC_BASE_URL または RENDER_EXTERNAL_URL 等を設定してください。"
+                        " ローカルなら PUBLIC_BASE_URL=http://127.0.0.1:8000（ポートは uvicorn と一致）。"
                         " Stripe を使わず固定トークンのみにする場合は STRIPE_SECRET_KEY を空にし、"
                         " VERIFY_PAYMENT_TOKEN と PAYMENT_LINK_URL を設定してください。"
                     ),
@@ -48,6 +49,7 @@ async def _verify_response_payment_required(response: Response, settings: Settin
                 status_code=503,
                 detail={"detail": "stripe_checkout_failed", "message": str(e)},
             ) from e
+        print(f"[verify] payment_required Stripe checkout_url={pay_url}", flush=True)
         response.headers["X-Payment-Link"] = pay_url
         return VerifyResponse(
             status="payment_required",
@@ -59,6 +61,7 @@ async def _verify_response_payment_required(response: Response, settings: Settin
 
     if settings.verify_payment_token and settings.payment_link_url:
         pay_url = settings.payment_link_url
+        print(f"[verify] payment_required payment_link_url={pay_url}", flush=True)
         response.headers["X-Payment-Link"] = pay_url
         return VerifyResponse(
             status="payment_required",

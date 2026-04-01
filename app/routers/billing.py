@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse
 
 from app.config import Settings, get_settings
-from app.stripe_service import create_verify_checkout_session, resolve_public_base_url
+from app.stripe_service import create_verify_checkout_session, resolve_checkout_return_base_url
 
 router = APIRouter(prefix="/billing", tags=["billing"])
 
@@ -16,10 +16,10 @@ async def create_checkout_session(settings: Settings = Depends(get_settings)):
     """支払い用 Stripe Checkout を明示的に発行（402 を経由せず取得したいクライアント向け）。"""
     if not settings.stripe_secret_key:
         raise HTTPException(status_code=503, detail="STRIPE_SECRET_KEY が未設定です")
-    if not resolve_public_base_url(settings):
+    if not resolve_checkout_return_base_url(settings):
         raise HTTPException(
             status_code=503,
-            detail="PUBLIC_BASE_URL、またはホストが提供する公開 URL（VERCEL_URL / RENDER_EXTERNAL_URL / RAILWAY_PUBLIC_DOMAIN 等）が必要です",
+            detail="STRIPE_CHECKOUT_RETURN_BASE_URL または PUBLIC_BASE_URL、または RENDER_EXTERNAL_URL 等の公開オリジンが必要です",
         )
     try:
         url, sid = await create_verify_checkout_session(settings)

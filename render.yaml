@@ -14,13 +14,15 @@ services:
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
-      # 未設定時は RENDER_EXTERNAL_URL がアプリ側で使われる（Stripe Checkout の戻り先）
+      # Checkout success/cancel のオリジン（未設定時は RENDER_EXTERNAL_URL または PUBLIC_BASE_URL）
+      - key: STRIPE_CHECKOUT_RETURN_BASE_URL
+        value: "https://verinode.onrender.com"
       - key: PUBLIC_BASE_URL
         sync: false
       - key: STRIPE_PRICE_ID
         sync: false
       - key: STRIPE_VERIFY_UNIT_AMOUNT_JPY
-        value: "50"
+        value: "100"
       - key: VERIFY_PAYMENT_TOKEN
         sync: false
       - key: PAYMENT_LINK_URL

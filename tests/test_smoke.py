@@ -77,7 +77,7 @@ def test_payment_gate_402_with_token(monkeypatch: pytest.MonkeyPatch):
             assert r.status_code == 200
             assert r.headers.get("X-Payment-Link") == "https://pay.example/checkout"
             assert r.json().get("status") == "payment_required"
-            assert "50円" in r.json().get("reason", "")
+            assert "100円" in r.json().get("reason", "")
             proof = c.post(
                 "/verify",
                 json={"claim": "test"},

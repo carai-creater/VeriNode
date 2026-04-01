@@ -58,14 +58,23 @@ class Settings(BaseSettings):
     stripe_webhook_secret: Optional[str] = Field(default=None, validation_alias="STRIPE_WEBHOOK_SECRET")
     stripe_price_id: Optional[str] = Field(default=None, validation_alias="STRIPE_PRICE_ID")
     stripe_verify_unit_amount_jpy: int = Field(
-        default=50,
+        default=100,
         ge=1,
         validation_alias="STRIPE_VERIFY_UNIT_AMOUNT_JPY",
+        description="Stripe price_data.unit_amount（JPY は円単位の整数。例: 100）",
     )
     public_base_url: Optional[str] = Field(
         default=None,
         validation_alias="PUBLIC_BASE_URL",
-        description="Stripe success/cancel URL 用の公開オリジン（例: https://api.example.com）",
+        description="公開オリジン（API ドキュメント・リダイレクト解決など）",
+    )
+    stripe_checkout_return_base_url: Optional[str] = Field(
+        default=None,
+        validation_alias="STRIPE_CHECKOUT_RETURN_BASE_URL",
+        description=(
+            "Stripe Checkout の success_url / cancel_url のオリジン（例: https://verinode.onrender.com）。"
+            "未設定時は PUBLIC_BASE_URL または RENDER_EXTERNAL_URL 等と同じ解決ロジック。"
+        ),
     )
 
     verify_score_threshold: float = Field(default=0.62, ge=0.0, le=1.0, validation_alias="VERIFY_SCORE_THRESHOLD")
@@ -81,6 +90,7 @@ class Settings(BaseSettings):
         "public_base_url",
         "stripe_webhook_secret",
         "stripe_price_id",
+        "stripe_checkout_return_base_url",
         "cors_allow_origins",
         mode="before",
     )

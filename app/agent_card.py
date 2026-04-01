@@ -124,7 +124,7 @@ def build_a2a_agent_card(request: Request, settings: Settings) -> Dict[str, Any]
         "metadata": {
             "legacyAgentDescriptor": f"{base}/.well-known/ai-agent.json",
             "openapiUrl": f"{base}/openapi.json",
-            "pricingJpyTaxIncludedPerRequest": 50,
+            "pricingJpyTaxIncludedPerRequest": 100,
             "note": "Not a full A2A message/task server; discovery uses A2A Agent Card shape.",
         },
     }

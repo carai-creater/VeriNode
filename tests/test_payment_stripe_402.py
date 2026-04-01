@@ -45,6 +45,6 @@ def test_verify_without_proof_returns_200_payment_required_stripe(client_stripe_
     assert body.get("status") == "payment_required"
     assert body.get("score") == 0.0
     assert body.get("sources") == []
-    assert "50円" in body.get("reason", "")
+    assert "100円" in body.get("reason", "")
     assert "https://checkout.stripe.test/mock-session" in body.get("reason", "")
     assert body.get("checkout_session_id") == "cs_test_mock_session_id"

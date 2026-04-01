@@ -12,7 +12,7 @@ from starlette.responses import JSONResponse, Response
 
 from app.config import get_settings
 from app.payment_gate import is_payment_proof_valid
-from app.stripe_service import create_verify_checkout_session, resolve_public_base_url
+from app.stripe_service import create_verify_checkout_session, resolve_checkout_return_base_url
 
 
 class PaymentRequiredMiddleware(BaseHTTPMiddleware):
@@ -50,7 +50,7 @@ class PaymentRequiredMiddleware(BaseHTTPMiddleware):
         if await is_payment_proof_valid(proof, settings):
             return await call_next(request)
 
-        public_origin = resolve_public_base_url(settings)
+        public_origin = resolve_checkout_return_base_url(settings)
         if settings.stripe_secret_key:
             if not public_origin:
                 return JSONResponse(
@@ -59,8 +59,9 @@ class PaymentRequiredMiddleware(BaseHTTPMiddleware):
                         "detail": "stripe_needs_public_base_url",
                         "message": (
                             "STRIPE_SECRET_KEY はあるが Checkout の戻り先が未定です。"
-                            " ローカルなら PUBLIC_BASE_URL=http://127.0.0.1:8000（ポートは uvicorn と一致）、"
-                            " 本番はホストの公開 URL または PUBLIC_BASE_URL を設定してください。"
+                            " STRIPE_CHECKOUT_RETURN_BASE_URL（例: https://verinode.onrender.com）または"
+                            " PUBLIC_BASE_URL / RENDER_EXTERNAL_URL を設定してください。"
+                            " ローカルなら PUBLIC_BASE_URL=http://127.0.0.1:8000（ポートは uvicorn と一致）。"
                             " Stripe を使わず固定トークンのみにする場合は STRIPE_SECRET_KEY を空にし、"
                             " VERIFY_PAYMENT_TOKEN と PAYMENT_LINK_URL を設定してください。"
                         ),

@@ -16,6 +16,6 @@
     "verify_path": "/verify",
     "well_known_agent_card": "__PUBLIC_BASE_URL__/.well-known/agent-card.json",
     "openapi": "__PUBLIC_BASE_URL__/openapi.json",
-    "pricing_jpy_tax_included_per_request": 50
+    "pricing_jpy_tax_included_per_request": 100
   }
 }

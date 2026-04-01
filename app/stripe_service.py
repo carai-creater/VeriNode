@@ -33,14 +33,23 @@ def resolve_public_base_url(settings: Settings) -> Optional[str]:
     return None
 
 
+def resolve_checkout_return_base_url(settings: Settings) -> Optional[str]:
+    """Stripe Checkout の success_url / cancel_url に使うオリジン（https 推奨）。"""
+    if settings.stripe_checkout_return_base_url:
+        return settings.stripe_checkout_return_base_url.rstrip("/")
+    return resolve_public_base_url(settings)
+
+
 def _create_checkout_session_sync(settings: Settings, base_url: str) -> Tuple[str, str]:
     stripe.api_key = settings.stripe_secret_key
+    # Stripe の success_url にはリダイレクト時に {CHECKOUT_SESSION_ID} が置換される（リテラルで渡す）
     success = f"{base_url}/billing/success?session_id={{CHECKOUT_SESSION_ID}}"
     cancel = f"{base_url}/?payment=canceled"
 
     if settings.stripe_price_id:
         line_items: list[dict[str, Any]] = [{"price": settings.stripe_price_id, "quantity": 1}]
     else:
+        unit = int(settings.stripe_verify_unit_amount_jpy)
         line_items = [
             {
                 "price_data": {
@@ -49,7 +58,7 @@ def _create_checkout_session_sync(settings: Settings, base_url: str) -> Tuple[st
                         "name": f"{SERVICE_NAME} — verification credit",
                         "description": "Single fact-check / verify API call credit (pay-per-use).",
                     },
-                    "unit_amount": int(settings.stripe_verify_unit_amount_jpy),
+                    "unit_amount": unit,
                 },
                 "quantity": 1,
             }
@@ -57,6 +66,7 @@ def _create_checkout_session_sync(settings: Settings, base_url: str) -> Tuple[st
 
     session = stripe.checkout.Session.create(
         mode="payment",
+        payment_method_types=["card"],
         line_items=line_items,
         success_url=success,
         cancel_url=cancel,
@@ -66,15 +76,31 @@ def _create_checkout_session_sync(settings: Settings, base_url: str) -> Tuple[st
     sid = session.id
     if not url:
         raise RuntimeError("Stripe Checkout Session に url がありません")
+    amount_note = (
+        f"stripe_price_id={settings.stripe_price_id}"
+        if settings.stripe_price_id
+        else f"unit_amount_jpy={int(settings.stripe_verify_unit_amount_jpy)}"
+    )
+    print(
+        "[stripe] Checkout Session created",
+        "mode=payment",
+        amount_note,
+        f"session_id={sid}",
+        f"success_url={success}",
+        f"cancel_url={cancel}",
+        f"checkout_url={url}",
+        flush=True,
+    )
     return url, sid
 
 
 async def create_verify_checkout_session(settings: Settings) -> Tuple[str, str]:
-    base = resolve_public_base_url(settings)
+    base = resolve_checkout_return_base_url(settings)
     if not base:
         raise RuntimeError(
             "Checkout の戻り先 URL が必要です。"
-            " PUBLIC_BASE_URL を設定するか、VERCEL_URL / RENDER_EXTERNAL_URL / RAILWAY_PUBLIC_DOMAIN 等の公開 URL 環境変数を利用してください。"
+            " STRIPE_CHECKOUT_RETURN_BASE_URL（例: https://verinode.onrender.com）または"
+            " PUBLIC_BASE_URL / VERCEL_URL / RENDER_EXTERNAL_URL / RAILWAY_PUBLIC_DOMAIN を設定してください。"
         )
     if not settings.stripe_secret_key:
         raise RuntimeError("STRIPE_SECRET_KEY が未設定です")
