@@ -148,15 +148,19 @@ async def verify(
         description="支払い証明（ChatGPT 等はヘッダーが使えない場合、Checkout Session ID cs_... または VERIFY_PAYMENT_TOKEN をクエリで指定）",
     ),
 ) -> VerifyResponse:
+    header_proof = request.headers.get("X-Payment-Proof") or request.headers.get("x-payment-proof")
+    hp = str(header_proof).strip() if header_proof else ""
+    qp = str(payment_proof).strip() if payment_proof is not None else ""
+    proof = (qp or hp) or None
+    if proof:
+        print(f"Payment proof received: {proof}", flush=True)
+
     if not settings.verify_skip_payment:
-        header_proof = request.headers.get("X-Payment-Proof") or request.headers.get("x-payment-proof")
-        hp = str(header_proof).strip() if header_proof else ""
-        qp = str(payment_proof).strip() if payment_proof is not None else ""
-        proof = (qp or hp) or None
-        if proof:
-            print(f"Payment proof received: {proof}", flush=True)
         if not await is_payment_proof_valid(proof, settings):
             return await _verify_response_payment_required(response, settings)
+        include_source_details = True
+    else:
+        include_source_details = bool(proof) and await is_payment_proof_valid(proof, settings)
 
     if not settings.serper_api_key and (not settings.google_cse_api_key or not settings.google_cse_cx):
         raise HTTPException(
@@ -164,7 +168,12 @@ async def verify(
             detail="検索プロバイダが未設定です。SERPER_API_KEY または GOOGLE_CSE_API_KEY + GOOGLE_CSE_CX を設定してください。",
         )
     try:
-        result = await verify_claim(body.claim, client, settings)
+        result = await verify_claim(
+            body.claim,
+            client,
+            settings,
+            include_source_details=include_source_details,
+        )
     except httpx.HTTPStatusError as e:
         raise HTTPException(status_code=502, detail=f"検索 API エラー: {e.response.status_code}") from e
     except RuntimeError as e:

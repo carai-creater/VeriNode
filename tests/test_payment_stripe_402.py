@@ -57,8 +57,14 @@ def test_verify_with_payment_proof_query_skips_payment_required(
     async def _paid(_sid, _settings):
         return True
 
-    async def _verify_claim(_claim, _client, _settings):
-        return {"status": "verified", "score": 0.9, "sources": ["https://example.com"], "reason": "mock"}
+    async def _verify_claim(_claim, _client, _settings, include_source_details=False):
+        return {
+            "status": "verified",
+            "score": 0.9,
+            "sources": ["https://example.com"],
+            "reason": "mock",
+            "source_details": [],
+        }
 
     monkeypatch.setattr("app.payment_gate.is_checkout_session_paid", _paid)
     monkeypatch.setattr("app.main.verify_claim", _verify_claim)
