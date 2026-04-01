@@ -47,8 +47,8 @@ def build_agent_card(request: Request, settings: Settings) -> Dict[str, Any]:
             "instructions": (
                 "POST /verify は未払い時も HTTP 200 を返し、JSON の status が payment_required のときは checkout_url に Stripe が発行した決済ページ URL（session.url）、"
                 "reason にも同じ URL を含む案内、ヘッダー X-Payment-Link にも同じ URL がある場合があります。"
-                "決済リンクは ID から組み立てず checkout_url を開く。決済後は Checkout Session ID（cs_...）をヘッダー X-Payment-Proof に付けて再試行する。"
-                " 開発用に VERIFY_PAYMENT_TOKEN をサーバが受け付ける場合は、その値を X-Payment-Proof に付与してもよい。"
+                "決済リンクは ID から組み立てず checkout_url を開く。決済後は Checkout Session ID（cs_...）をヘッダー X-Payment-Proof またはクエリ payment_proof に付けて POST /verify を再試行する。"
+                " 開発用に VERIFY_PAYMENT_TOKEN をサーバが受け付ける場合は、その値を X-Payment-Proof または payment_proof に付与してもよい。"
             ),
         },
         "capabilities": [
@@ -65,7 +65,7 @@ def build_agent_card(request: Request, settings: Settings) -> Dict[str, Any]:
         ],
         "pricing": {
             "model": "pay_per_request",
-            "details": "HTTP 200 で payment_required 時は checkout_url（Stripe の session.url）で決済。reason / X-Payment-Link も同じ URL。支払済み cs_... を X-Payment-Proof で提示。",
+            "details": "HTTP 200 で payment_required 時は checkout_url（Stripe の session.url）で決済。reason / X-Payment-Link も同じ URL。支払済み cs_... は X-Payment-Proof または ?payment_proof= で提示。",
         },
         "extensions": {
             "verinode": {
@@ -89,7 +89,7 @@ def build_a2a_agent_card(request: Request, settings: Settings) -> Dict[str, Any]
         "Returns verification score, sources, and reason. "
         "If payment is required, responds with HTTP 200, status payment_required, field checkout_url is the Stripe-hosted payment URL (session.url), "
         "reason includes the same URL, and header X-Payment-Link matches; "
-        "after payment, retry with header X-Payment-Proof set to the Checkout Session id (cs_...). "
+        "after payment, retry with query payment_proof=cs_... or header X-Payment-Proof set to the Checkout Session id. "
         "Does not implement A2A SendMessage; use this REST contract."
     )
     return {

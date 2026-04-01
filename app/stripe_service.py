@@ -117,6 +117,7 @@ def _retrieve_session_sync(session_id: str, secret_key: str) -> Any:
 
 
 async def is_checkout_session_paid(session_id: str, settings: Settings) -> bool:
+    """Checkout Session が完了し、モード payment で支払い済みか（status=complete かつ payment_status=paid）。"""
     if not settings.stripe_secret_key:
         return False
     if not (session_id.startswith("cs_test_") or session_id.startswith("cs_live_")):
@@ -128,5 +129,9 @@ async def is_checkout_session_paid(session_id: str, settings: Settings) -> bool:
             settings.stripe_secret_key,
         )
     except stripe.StripeError:
+        print("Payment status: stripe_error", flush=True)
         return False
-    return getattr(s, "payment_status", None) == "paid"
+    session_status = getattr(s, "status", None)
+    payment_status = getattr(s, "payment_status", None)
+    print(f"Payment status: {session_status} / {payment_status}", flush=True)
+    return session_status == "complete" and payment_status == "paid"

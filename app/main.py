@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import AsyncIterator
+from typing import AsyncIterator, Optional
 
 import httpx
-from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import HTMLResponse, JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 
@@ -143,9 +143,18 @@ async def verify(
     body: VerifyRequest,
     client: httpx.AsyncClient = Depends(get_http_client),
     settings: Settings = Depends(get_settings),
+    payment_proof: Optional[str] = Query(
+        None,
+        description="支払い証明（ChatGPT 等はヘッダーが使えない場合、Checkout Session ID cs_... または VERIFY_PAYMENT_TOKEN をクエリで指定）",
+    ),
 ) -> VerifyResponse:
     if not settings.verify_skip_payment:
-        proof = request.headers.get("X-Payment-Proof") or request.headers.get("x-payment-proof")
+        header_proof = request.headers.get("X-Payment-Proof") or request.headers.get("x-payment-proof")
+        hp = str(header_proof).strip() if header_proof else ""
+        qp = str(payment_proof).strip() if payment_proof is not None else ""
+        proof = (qp or hp) or None
+        if proof:
+            print(f"Payment proof received: {proof}", flush=True)
         if not await is_payment_proof_valid(proof, settings):
             return await _verify_response_payment_required(response, settings)
 

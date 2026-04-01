@@ -49,3 +49,24 @@ def test_verify_without_proof_returns_200_payment_required_stripe(client_stripe_
     assert "https://checkout.stripe.test/mock-session" in body.get("reason", "")
     assert body.get("checkout_url") == "https://checkout.stripe.test/mock-session"
     assert body.get("checkout_session_id") == "cs_test_mock_session_id"
+
+
+def test_verify_with_payment_proof_query_skips_payment_required(
+    client_stripe_gate: TestClient, monkeypatch: pytest.MonkeyPatch
+):
+    async def _paid(_sid, _settings):
+        return True
+
+    async def _verify_claim(_claim, _client, _settings):
+        return {"status": "verified", "score": 0.9, "sources": ["https://example.com"], "reason": "mock"}
+
+    monkeypatch.setattr("app.payment_gate.is_checkout_session_paid", _paid)
+    monkeypatch.setattr("app.main.verify_claim", _verify_claim)
+    r = client_stripe_gate.post(
+        "/verify?payment_proof=cs_test_abc123",
+        json={"claim": "anything"},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body.get("status") == "verified"
+    assert body.get("score") == 0.9
