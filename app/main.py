@@ -56,6 +56,7 @@ async def _verify_response_payment_required(response: Response, settings: Settin
             score=0.0,
             sources=[],
             reason=PAYMENT_REASON_FMT.format(url=pay_url),
+            checkout_url=pay_url,
             checkout_session_id=sid,
         )
 
@@ -68,6 +69,7 @@ async def _verify_response_payment_required(response: Response, settings: Settin
             score=0.0,
             sources=[],
             reason=PAYMENT_REASON_FMT.format(url=pay_url),
+            checkout_url=pay_url,
             checkout_session_id=None,
         )
 

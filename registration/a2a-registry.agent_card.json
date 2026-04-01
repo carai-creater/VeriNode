@@ -8,7 +8,7 @@
   "skills": [
     {
       "id": "verinode-verify",
-      "description": "REST: POST __PUBLIC_BASE_URL__/verify with JSON body {\"claim\":\"...\"}. If status is payment_required, follow X-Payment-Link / reason URL (Stripe), then retry with X-Payment-Proof: cs_... . Not A2A SendMessage."
+      "description": "REST: POST __PUBLIC_BASE_URL__/verify with JSON body {\"claim\":\"...\"}. If status is payment_required, open checkout_url (Stripe session.url; same as X-Payment-Link / reason), then retry with X-Payment-Proof: cs_... . Not A2A SendMessage."
     }
   ],
   "metadata": {

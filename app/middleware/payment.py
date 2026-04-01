@@ -82,9 +82,11 @@ class PaymentRequiredMiddleware(BaseHTTPMiddleware):
                 content={
                     "detail": "payment_required",
                     "message": (
-                        "Stripe Checkout で支払い後、返却された Checkout Session ID（cs_...）を "
+                        "決済は checkout_url（またはヘッダー X-Payment-Link）の Stripe ページで行い、"
+                        "支払後に返却された Checkout Session ID（cs_...）を "
                         "X-Payment-Proof ヘッダーに付けて再試行してください。"
                     ),
+                    "checkout_url": pay_url,
                     "checkout_session_id": sid,
                 },
                 headers={"X-Payment-Link": pay_url},

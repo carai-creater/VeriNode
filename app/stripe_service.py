@@ -41,6 +41,7 @@ def resolve_checkout_return_base_url(settings: Settings) -> Optional[str]:
 
 
 def _create_checkout_session_sync(settings: Settings, base_url: str) -> Tuple[str, str]:
+    """Returns (checkout_url, session_id) where checkout_url is session.url from Stripe."""
     stripe.api_key = settings.stripe_secret_key
     # Stripe の success_url にはリダイレクト時に {CHECKOUT_SESSION_ID} が置換される（リテラルで渡す）
     success = f"{base_url}/billing/success?session_id={{CHECKOUT_SESSION_ID}}"
@@ -72,9 +73,10 @@ def _create_checkout_session_sync(settings: Settings, base_url: str) -> Tuple[st
         cancel_url=cancel,
         metadata={"product": "verinode_verify", "service": SERVICE_NAME},
     )
-    url = session.url or ""
-    sid = session.id
-    if not url:
+    # 決済ページへの直リンクは session.url のみを使う（ID から URL を組み立てない）
+    checkout_url = session.url or ""
+    session_id = session.id
+    if not checkout_url:
         raise RuntimeError("Stripe Checkout Session に url がありません")
     amount_note = (
         f"stripe_price_id={settings.stripe_price_id}"
@@ -85,16 +87,17 @@ def _create_checkout_session_sync(settings: Settings, base_url: str) -> Tuple[st
         "[stripe] Checkout Session created",
         "mode=payment",
         amount_note,
-        f"session_id={sid}",
+        f"session_id={session_id}",
         f"success_url={success}",
         f"cancel_url={cancel}",
-        f"checkout_url={url}",
+        f"checkout_url={checkout_url}",
         flush=True,
     )
-    return url, sid
+    return checkout_url, session_id
 
 
 async def create_verify_checkout_session(settings: Settings) -> Tuple[str, str]:
+    """(Stripe Checkout の session.url, session.id)。URL は常に API が返す完成済みの決済ページリンク。"""
     base = resolve_checkout_return_base_url(settings)
     if not base:
         raise RuntimeError(
