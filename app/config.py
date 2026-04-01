@@ -53,12 +53,12 @@ class Settings(BaseSettings):
     )
     verify_payment_token: Optional[str] = Field(default=None, validation_alias="VERIFY_PAYMENT_TOKEN")
 
-    # Stripe（設定時は 402 で Checkout URL を発行し、支払済み cs_... を X-Payment-Proof で受け付ける）
+    # Stripe（設定時は未払い POST /verify が 200 + payment_required で Checkout URL を返し、支払済み cs_... を X-Payment-Proof で受け付ける）
     stripe_secret_key: Optional[str] = Field(default=None, validation_alias="STRIPE_SECRET_KEY")
     stripe_webhook_secret: Optional[str] = Field(default=None, validation_alias="STRIPE_WEBHOOK_SECRET")
     stripe_price_id: Optional[str] = Field(default=None, validation_alias="STRIPE_PRICE_ID")
     stripe_verify_unit_amount_jpy: int = Field(
-        default=100,
+        default=50,
         ge=1,
         validation_alias="STRIPE_VERIFY_UNIT_AMOUNT_JPY",
     )

@@ -26,6 +26,11 @@ def test_stripe_key_without_public_base_url_returns_503(monkeypatch: pytest.Monk
         with TestClient(app) as c:
             r = c.post("/verify", json={"claim": "x"})
             assert r.status_code == 503
-            assert r.json().get("detail") == "stripe_needs_public_base_url"
+            body = r.json()
+            detail = body.get("detail")
+            if isinstance(detail, dict):
+                assert detail.get("detail") == "stripe_needs_public_base_url"
+            else:
+                assert detail == "stripe_needs_public_base_url"
     finally:
         config_module.get_settings.cache_clear()

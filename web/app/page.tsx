@@ -112,11 +112,12 @@ export default function HomePage() {
                 API リファレンス（プレビュー）
               </h2>
               <p className="mt-4 text-zinc-400">
-                課金ゲート通過後は{" "}
+                未払い時は HTTP 200 で <code className="rounded bg-white/10 px-1 font-mono text-xs">payment_required</code>{" "}
+                と <code className="rounded bg-white/10 px-1 font-mono text-xs">reason</code>（決済 URL）が返ります。決済後は{" "}
                 <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs">
                   X-Payment-Proof
                 </code>{" "}
-                に Checkout Session ID を付与して呼び出します。
+                に Checkout Session ID を付けて再呼び出しします。
               </p>
             </div>
             <div className="mx-auto mt-12 max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/50 shadow-2xl">

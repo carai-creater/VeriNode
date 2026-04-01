@@ -1,4 +1,4 @@
-"""Stripe 課金経路で 402 が返ること（実 Stripe には接続しない）。"""
+"""Stripe 課金経路で未払い時は HTTP 200 + payment_required（実 Stripe には接続しない）。"""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ def client_stripe_gate(monkeypatch: pytest.MonkeyPatch):
         return "https://checkout.stripe.test/mock-session", "cs_test_mock_session_id"
 
     monkeypatch.setattr(
-        "app.middleware.payment.create_verify_checkout_session",
+        "app.main.create_verify_checkout_session",
         _fake_checkout,
     )
 
@@ -37,10 +37,14 @@ def test_landing_pages_skip_payment_gate(client_stripe_gate: TestClient):
     assert client_stripe_gate.get("/en").status_code == 200
 
 
-def test_verify_without_proof_returns_402_stripe_checkout(client_stripe_gate: TestClient):
+def test_verify_without_proof_returns_200_payment_required_stripe(client_stripe_gate: TestClient):
     r = client_stripe_gate.post("/verify", json={"claim": "anything"})
-    assert r.status_code == 402
+    assert r.status_code == 200
     assert r.headers.get("X-Payment-Link") == "https://checkout.stripe.test/mock-session"
     body = r.json()
-    assert body.get("detail") == "payment_required"
+    assert body.get("status") == "payment_required"
+    assert body.get("score") == 0.0
+    assert body.get("sources") == []
+    assert "50円" in body.get("reason", "")
+    assert "https://checkout.stripe.test/mock-session" in body.get("reason", "")
     assert body.get("checkout_session_id") == "cs_test_mock_session_id"

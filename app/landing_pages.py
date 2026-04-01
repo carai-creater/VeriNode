@@ -325,7 +325,7 @@ def html_landing_ja() -> str:
             <p>デジタルサービス（API）。物理的な配送はありません。決済完了後、当該リクエストに対する検証結果を即時に返却します。</p>
             <ul>
               <li>主なエンドポイント: <code>POST /verify</code></li>
-              <li>未決済時は <code>402</code> と Stripe Checkout への案内（<code>X-Payment-Link</code>）</li>
+              <li>未決済時は HTTP <code>200</code> で <code>status: payment_required</code>、<code>reason</code> に決済案内（<code>X-Payment-Link</code> ヘッダーあり）</li>
               <li>エージェント向け記述: <code>/.well-known/agent-card.json</code></li>
             </ul>
           </div>
@@ -481,7 +481,7 @@ def html_landing_en() -> str:
             <p>Digital service (API only). Nothing is shipped physically. After payment succeeds, we return verification results for that request immediately.</p>
             <ul>
               <li>Primary endpoint: <code>POST /verify</code></li>
-              <li>If unpaid: <code>402 Payment Required</code> and <code>X-Payment-Link</code> to Stripe Checkout</li>
+              <li>If unpaid: HTTP <code>200</code> with <code>status: payment_required</code>, checkout URL in <code>reason</code> and optional <code>X-Payment-Link</code></li>
               <li>Agent discovery: <code>/.well-known/agent-card.json</code></li>
             </ul>
           </div>

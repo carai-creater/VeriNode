@@ -1,4 +1,8 @@
-"""未払いリクエストに HTTP 402 と X-Payment-Link（Stripe Checkout または固定 URL）を返すミドルウェア。"""
+"""未払いリクエストに HTTP 402 と X-Payment-Link（Stripe Checkout または固定 URL）を返すミドルウェア。
+
+POST /verify の課金判定はエンドポイント側で行い、HTTP 200 + JSON（reason に決済 URL）を返す。
+その他の保護ルートでは従来どおり 402 を返す。
+"""
 
 from __future__ import annotations
 
@@ -12,7 +16,7 @@ from app.stripe_service import create_verify_checkout_session, resolve_public_ba
 
 
 class PaymentRequiredMiddleware(BaseHTTPMiddleware):
-    """支払い証明が無い場合 402。Stripe 設定時はその場で Checkout を生成して X-Payment-Link に載せる。"""
+    """支払い証明が無い場合 402（/verify を除く）。Stripe 設定時は Checkout URL を X-Payment-Link に載せる。"""
 
     def __init__(self, app, exempt_paths: frozenset[str] | None = None) -> None:
         super().__init__(app)
@@ -26,6 +30,7 @@ class PaymentRequiredMiddleware(BaseHTTPMiddleware):
                 "/openapi.json",
                 "/.well-known/ai-agent.json",
                 "/.well-known/agent-card.json",
+                "/verify",
                 "/billing/checkout-session",
                 "/billing/success",
                 "/webhooks/stripe",

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import AsyncIterator
 
 import httpx
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 
@@ -13,8 +13,74 @@ from app.landing_pages import html_landing_en, html_landing_ja
 from app.config import Settings, get_settings
 from app.middleware.payment import PaymentRequiredMiddleware
 from app.models import VerifyRequest, VerifyResponse
+from app.payment_gate import is_payment_proof_valid
 from app.routers import billing, webhooks
 from app.verify_service import verify_claim
+from app.stripe_service import create_verify_checkout_session, resolve_public_base_url
+
+PAYMENT_REASON_FMT = (
+    "情報の検証には50円が必要です。こちらのリンクから決済を完了してください：{url}"
+)
+
+
+async def _verify_response_payment_required(response: Response, settings: Settings) -> VerifyResponse:
+    """未払い時: HTTP 200・VerifyResponse（reason に決済 URL、必要なら X-Payment-Link ヘッダー）。"""
+    if settings.stripe_secret_key:
+        public_origin = resolve_public_base_url(settings)
+        if not public_origin:
+            raise HTTPException(
+                status_code=503,
+                detail={
+                    "detail": "stripe_needs_public_base_url",
+                    "message": (
+                        "STRIPE_SECRET_KEY はあるが Checkout の戻り先が未定です。"
+                        " ローカルなら PUBLIC_BASE_URL=http://127.0.0.1:8000（ポートは uvicorn と一致）、"
+                        " 本番はホストの公開 URL または PUBLIC_BASE_URL を設定してください。"
+                        " Stripe を使わず固定トークンのみにする場合は STRIPE_SECRET_KEY を空にし、"
+                        " VERIFY_PAYMENT_TOKEN と PAYMENT_LINK_URL を設定してください。"
+                    ),
+                },
+            )
+        try:
+            pay_url, sid = await create_verify_checkout_session(settings)
+        except Exception as e:
+            raise HTTPException(
+                status_code=503,
+                detail={"detail": "stripe_checkout_failed", "message": str(e)},
+            ) from e
+        response.headers["X-Payment-Link"] = pay_url
+        return VerifyResponse(
+            status="payment_required",
+            score=0.0,
+            sources=[],
+            reason=PAYMENT_REASON_FMT.format(url=pay_url),
+            checkout_session_id=sid,
+        )
+
+    if settings.verify_payment_token and settings.payment_link_url:
+        pay_url = settings.payment_link_url
+        response.headers["X-Payment-Link"] = pay_url
+        return VerifyResponse(
+            status="payment_required",
+            score=0.0,
+            sources=[],
+            reason=PAYMENT_REASON_FMT.format(url=pay_url),
+            checkout_session_id=None,
+        )
+
+    raise HTTPException(
+        status_code=503,
+        detail={
+            "detail": "payment_not_configured",
+            "message": (
+                "課金が有効ですが設定が不足しています。"
+                " Stripe を使う: STRIPE_SECRET_KEY と PUBLIC_BASE_URL（または VERCEL_URL / RENDER_EXTERNAL_URL / RAILWAY_PUBLIC_DOMAIN）。"
+                " 固定トークンのみ: VERIFY_PAYMENT_TOKEN と PAYMENT_LINK_URL。"
+                " ゲートを無効にする: VERIFY_SKIP_PAYMENT=1。"
+            ),
+        },
+    )
+
 
 app = FastAPI(
     title=f"{SERVICE_NAME} — Fact-check API",
@@ -67,10 +133,17 @@ async def a2a_well_known_agent_card(request: Request, settings: Settings = Depen
 
 @app.post("/verify", response_model=VerifyResponse)
 async def verify(
+    request: Request,
+    response: Response,
     body: VerifyRequest,
     client: httpx.AsyncClient = Depends(get_http_client),
     settings: Settings = Depends(get_settings),
 ) -> VerifyResponse:
+    if not settings.verify_skip_payment:
+        proof = request.headers.get("X-Payment-Proof") or request.headers.get("x-payment-proof")
+        if not await is_payment_proof_valid(proof, settings):
+            return await _verify_response_payment_required(response, settings)
+
     if not settings.serper_api_key and (not settings.google_cse_api_key or not settings.google_cse_cx):
         raise HTTPException(
             status_code=503,
