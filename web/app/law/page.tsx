@@ -13,11 +13,14 @@ export default function LawPage() {
     <>
       <LegalShell title="特定商取引法に基づく表記">
         <p className="text-zinc-400">
-          通信販売（デジタルサービス）に関する表示です。販売価格の詳細は{" "}
+          通信販売（デジタルサービス）に関する表示です。お申し込みはウェブサイト上からオンラインで行います。販売価格の詳細は{" "}
           <Link href="/#pricing" className="text-brand-400 hover:underline">
             料金ページ
           </Link>
           をご確認ください。
+        </p>
+        <p className="text-sm text-zinc-500">
+          所在地は本ページ上では表示しておりません。法令に基づく開示請求があった場合は、ご連絡先に記載のメールにて対応します。
         </p>
         <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs text-amber-200/90">
           下記の <span className="font-mono text-amber-100">[ ]</span>{" "}
@@ -37,12 +40,6 @@ export default function LawPage() {
                   代表責任者
                 </th>
                 <td className="px-4 py-3 font-mono text-zinc-200">[氏名]</td>
-              </tr>
-              <tr>
-                <th className="whitespace-nowrap bg-zinc-900/50 px-4 py-3 font-medium text-zinc-400">
-                  所在地
-                </th>
-                <td className="px-4 py-3 font-mono text-zinc-200">[郵便番号・住所]</td>
               </tr>
               <tr>
                 <th className="whitespace-nowrap bg-zinc-900/50 px-4 py-3 font-medium text-zinc-400">

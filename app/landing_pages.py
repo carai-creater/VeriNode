@@ -335,7 +335,7 @@ def html_landing_ja() -> str:
               決済処理は <strong>Stripe, Inc.</strong> のセキュアな Checkout を利用します。カード番号等の決済情報は当社サーバーに保存せず、Stripe の方針に従って取り扱われます。
             </p>
             <p style="margin-bottom:0;">
-              本ページの<strong>特定商取引法に基づく表記</strong>に、販売事業者名・所在地・連絡先・支払方法・引渡時期・返品条件を記載しています。
+              本ページの<strong>特定商取引法に基づく表記</strong>に、販売事業者名・連絡先・支払方法・引渡時期・返品条件を記載しています。お申し込みはオンラインのみです。
             </p>
           </div>
         </div>
@@ -381,12 +381,12 @@ def html_landing_ja() -> str:
     <section id="legal" class="section">
       <div class="shell">
         <h2 class="section-head">特定商取引法に基づく表記</h2>
-        <p class="section-sub">通信販売（デジタルサービス）に関する表示です。</p>
+        <p class="section-sub">通信販売（デジタルサービス）に関する表示です。お申し込みはウェブサイト上からオンラインで行います。</p>
+        <p class="section-sub" style="font-size:15px;margin-top:-0.5rem;">所在地は本ページ上では表示しておりません。法令に基づく開示請求があった場合は、下記連絡先のメールにて対応します。</p>
         <div class="card">
           <table class="legal" aria-label="特定商取引法に基づく表記">
             <tbody>
               <tr><th scope="row">運営者名</th><td>林 連太郎</td></tr>
-              <tr><th scope="row">所在地</th><td>〒849-0937 佐賀県佐賀市鍋島4丁目2-11 コーポ鍋島２０２</td></tr>
               <tr><th scope="row">連絡先</th><td><a href="mailto:carai@cocarai.com">carai@cocarai.com</a>（お問い合わせはメールにて受け付けます）</td></tr>
               <tr><th scope="row">支払方法</th><td>クレジットカード決済（Stripe）</td></tr>
               <tr><th scope="row">商品の引渡時期</th><td>決済完了後、即時（API 応答として提供）</td></tr>
@@ -491,7 +491,7 @@ def html_landing_en() -> str:
               Card payments are processed by <strong>Stripe, Inc.</strong> via Checkout. Full card numbers are not stored on our servers; handling follows Stripe&rsquo;s policies.
             </p>
             <p style="margin-bottom:0;">
-              The <strong>legal notice</strong> below (Japan Act on Specified Commercial Transactions) lists the seller name, address, contact, payment method, delivery timing, and return policy in Japanese as required domestically. An English summary of the same facts is included in the table labels where helpful.
+              The <strong>legal notice</strong> below (Japan Act on Specified Commercial Transactions) lists the seller name, contact, payment method, delivery timing, and return policy. Sign-up is online only; we do not publish a physical address on this page and respond to lawful disclosure requests by email.
             </p>
           </div>
         </div>
@@ -538,13 +538,13 @@ def html_landing_en() -> str:
       <div class="shell">
         <h2 class="section-head">Specified Commercial Transactions (Japan)</h2>
         <p class="section-sub">
-          Legally required disclosure for online sales of digital services in Japan (Act on Specified Commercial Transactions). Values match the Japanese version on <a href="/">/</a>.
+          Legally required disclosure for online sales of digital services in Japan (Act on Specified Commercial Transactions). Values match the Japanese version on <a href="/">/</a>. Applications are accepted online only.
         </p>
+        <p class="section-sub" style="font-size:15px;margin-top:-0.5rem;">We do not publish a physical address on this page. If disclosure is required by law, we respond via the contact email below.</p>
         <div class="card">
           <table class="legal" aria-label="Specified commercial transactions disclosure">
             <tbody>
               <tr><th scope="row">Seller (operator)</th><td>林 連太郎 (Rentaro Hayashi)</td></tr>
-              <tr><th scope="row">Address</th><td>〒849-0937 佐賀県佐賀市鍋島4丁目2-11 コーポ鍋島２０２, Japan</td></tr>
               <tr><th scope="row">Contact</th><td><a href="mailto:carai@cocarai.com">carai@cocarai.com</a> (email inquiries)</td></tr>
               <tr><th scope="row">Payment method</th><td>Credit card via Stripe</td></tr>
               <tr><th scope="row">Delivery</th><td>Immediately after payment (JSON API response)</td></tr>

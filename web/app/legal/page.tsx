@@ -13,11 +13,14 @@ export default function LegalPage() {
     <>
       <LegalShell title="特定商取引法に基づく表記">
         <p className="text-zinc-400">
-          ストライプ（Stripe）等の決済審査に必要な事項を、以下のとおり表示します。販売価格の詳細は{" "}
+          ストライプ（Stripe）等の決済審査に必要な事項を、以下のとおり表示します。お申し込みはウェブサイト上からオンラインで行います。販売価格の詳細は{" "}
           <Link href="/#pricing" className="text-brand-400 hover:underline">
             料金ページ
           </Link>
           をご確認ください。
+        </p>
+        <p className="text-sm text-zinc-500">
+          所在地は本ページ上では表示しておりません。法令に基づく開示請求があった場合は、下記メールにて対応します。
         </p>
         <div className="overflow-x-auto rounded-xl border border-white/10">
           <table className="w-full min-w-[28rem] text-left text-sm">
@@ -33,14 +36,6 @@ export default function LegalPage() {
                   代表責任者
                 </th>
                 <td className="px-4 py-3 text-zinc-200">林 連太郎</td>
-              </tr>
-              <tr>
-                <th className="whitespace-nowrap bg-zinc-900/50 px-4 py-3 font-medium text-zinc-400">
-                  所在地
-                </th>
-                <td className="px-4 py-3 text-zinc-200">
-                  〒849-0937 佐賀県佐賀市鍋島4丁目2-11 コーポ鍋島２０２
-                </td>
               </tr>
               <tr>
                 <th className="whitespace-nowrap bg-zinc-900/50 px-4 py-3 font-medium text-zinc-400">
